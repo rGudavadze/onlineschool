@@ -1,11 +1,10 @@
-version: "3.8"
+version: "3"
 
 services:
   django:
     build: .
     container_name: django
-    command:
-      - python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000
 
     volumes:
       - .:/usr/src/app
@@ -23,3 +22,8 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
+volumes:
+  pgdata:
