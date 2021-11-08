@@ -19,7 +19,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                                              description=data['description'], slug=data['slug'], quantity=data['quantity'],
                                              category=Category.objects.get(slug=data['category']))
         new_product.save()
-        serializer = ProductSerializer(new_product)
+        serializer = ProductSerializer(new_product, many=True)
 
         return Response(serializer.data)
 

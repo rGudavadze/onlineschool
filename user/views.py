@@ -24,7 +24,7 @@ class LoginView(APIView):
         email = request.data['email']
         password = request.data['password']
 
-        user = User.objects.filter(email=email).first()
+        user = User.objects.get(email=email)
 
         if user is None:
             raise AuthenticationFailed("User not found!")
@@ -63,7 +63,7 @@ class UserView(APIView):
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
 
         except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Unauthenticated!')
+            raise AuthenticationFailed('Unauthenticated, JWT expired!')
 
         user = User.objects.filter(id=payload['id']).first()
 
