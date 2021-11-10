@@ -38,7 +38,6 @@ class LoginView(APIView):
             'iat': datetime.datetime.utcnow()
         }
 
-        # token = jwt.encode(payload, 'secret', algorithm='HS256').decode('utf-8')
         token = jwt.encode(payload, 'secret', algorithm='HS256').decode('utf-8')    # older version of PyJWT==1.7.1
 
         response = Response()
@@ -48,7 +47,6 @@ class LoginView(APIView):
         response.data = {
             'jwt': token
         }
-
         return response
 
 

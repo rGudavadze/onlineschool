@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import viewsets
 from .models import Product, Category
@@ -18,8 +17,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         new_product = Product.objects.create(name=data['name'], price=data['price'], available=data['available'],
                                              description=data['description'], slug=data['slug'], quantity=data['quantity'],
                                              category=Category.objects.get(slug=data['category']))
+
         new_product.save()
-        serializer = ProductSerializer(new_product, many=True)
+
+        serializer = ProductSerializer(new_product)
 
         return Response(serializer.data)
 
