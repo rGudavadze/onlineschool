@@ -21,13 +21,13 @@ from django.urls import path, include
 # )
 
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/v1/product-app/', include('product.urls')),
     path('api/v1/user/', include('user.urls')),
     path('api/v1/purchase/', include('purchase.urls')),
+    path('api/v1/reviews/', include('review.urls')),
 
     # path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),  SWAGGER
 ]

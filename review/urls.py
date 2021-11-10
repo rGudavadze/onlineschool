@@ -7,7 +7,6 @@ router = DefaultRouter()
 router.register('reviews', ReviewViewset, basename='reviews')
 
 
-
 urlpatterns = [
   url('', include(router.urls))
 ]
