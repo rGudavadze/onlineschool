@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -95,9 +96,14 @@ DATABASES = {
         'HOST': 'pgdb',
         'PORT': 5432,
 
+        # 'ENGINE': os.environ.get("SQL_ENGINE"),  # "django.db.backends.sqlite3"
+        # 'NAME': os.environ.get("SQL_DATABASE"),  # BASE_DIR / 'db.sqlite3'
+        # 'USER': os.environ.get("SQL_USER"),
+        # 'PASSWORD': os.environ.get("SQL_PASSWORD"),
+        # 'HOST': os.environ.get("SQL_HOST"),
+        # 'PORT': os.environ.get("SQL_PORT"),
 
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
+
     }
 }
 
@@ -122,9 +128,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'user.authenticate.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',

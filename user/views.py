@@ -1,3 +1,5 @@
+from django.contrib.auth import authenticate
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -21,33 +23,63 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     def post(self, request):
-        email = request.data['email']
-        password = request.data['password']
+        data = request.data
+        username = data['username']
+        password = data['password']
 
-        user = User.objects.get(email=email)
+        user = authenticate(username=username, password=password)
 
-        if user is None:
-            raise AuthenticationFailed("User not found!")
+        if user:
+            payload = {
+                'id': user.id,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+                'iat': datetime.datetime.utcnow()
+            }
 
-        if not user.check_password(password):
-            raise AuthenticationFailed("password is not correct!")
+            token = jwt.encode(payload, 'secret', algorithm='HS256')
 
-        payload = {
-            'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-            'iat': datetime.datetime.utcnow()
-        }
+            response = Response()
 
-        token = jwt.encode(payload, 'secret', algorithm='HS256').decode('utf-8')    # older version of PyJWT==1.7.1
+            response.set_cookie(key='jwt', value=token, httponly=True)
 
-        response = Response()
+            response.data = {
+                'jwt': token
+            }
 
-        response.set_cookie(key='jwt', value=token, httponly=True)
+            return response
 
-        response.data = {
-            'jwt': token
-        }
-        return response
+        return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+# class LoginView(APIView):
+#     def post(self, request):
+#         email = request.data['email']
+#         password = request.data['password']
+#
+#         user = User.objects.get(email=email)
+#
+#         if user is None:
+#             raise AuthenticationFailed("User not found!")
+#
+#         if not user.check_password(password):
+#             raise AuthenticationFailed("password is not correct!")
+#
+#         payload = {
+#             'id': user.id,
+#             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+#             'iat': datetime.datetime.utcnow()
+#         }
+#
+#         token = jwt.encode(payload, 'secret', algorithm='HS256').decode('utf-8')    # older version of PyJWT==1.7.1
+#
+#         response = Response()
+#
+#         response.set_cookie(key='jwt', value=token, httponly=True)
+#
+#         response.data = {
+#             'jwt': token
+#         }
+#         return response
 
 
 class UserView(APIView):

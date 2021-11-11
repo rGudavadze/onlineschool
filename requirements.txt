@@ -28,3 +28,4 @@ simplejson==3.17.5
 sqlparse==0.4.2
 uritemplate==4.1.1
 urllib3==1.26.7
+django-dotenv==1.4.2
