@@ -7,6 +7,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=256, unique=True)
     email = models.CharField(max_length=256, unique=True)
     password = models.CharField(max_length=256)
+    password_confirm = models.CharField(max_length=256)
     role = models.CharField(max_length=9, choices=(("USER", "user"), ("SELLER", "seller")), default="USER")
 
     # USERNAME_FIELD = 'email'

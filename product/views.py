@@ -1,7 +1,7 @@
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from .models import Product, Category
-from .serializer import ProductSerializer, CategorySerializer
+from .serializers import ProductSerializer, CategorySerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -9,13 +9,23 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
 
     def create(self, request, *args, **kwargs):
+        user = request.user
+
+        if user.is_anonymous or user.role != "SELLER":
+            return Response(
+                {"message": "You do not have permission to add course!"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         data = request.data
 
-        new_product = Product.objects.create(name=data['name'], price=data['price'], available=data['available'],
-                                             description=data['description'], slug=data['slug'], quantity=data['quantity'],
-                                             category=Category.objects.get(slug=data['category']))
-
-        new_product.save()
+        new_product = Product.objects.create(
+            name=data['name'],
+            price=data['price'],
+            description=data['description'],
+            seller=user,
+            category=Category.objects.get(slug=data['category'])
+        )
 
         serializer = ProductSerializer(new_product)
 

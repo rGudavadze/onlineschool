@@ -5,7 +5,6 @@ from .views import ProductViewSet, CategoryViewSet
 
 router = DefaultRouter()
 router.register('products', ProductViewSet, basename='products')
-router.register('product-categories', CategoryViewSet, basename='product-categories')
 
 
 urlpatterns = [

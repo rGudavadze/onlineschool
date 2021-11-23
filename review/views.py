@@ -31,8 +31,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
                                            user=request.user,
                                            product=current_product)
 
-        new_review.save()
-
         current_product.rating = (current_product.rating * current_product.rating_quantity + data['rating']) / \
                                  (current_product.rating_quantity + 1)
         current_product.rating_quantity += 1
@@ -59,10 +57,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
                                       old_rating + updated_data['rating']) / \
                                       current_product.rating_quantity
             current_product.save()
-
-        # instance.rating = updated_data.get('rating', instance.rating)
-        # instance.text = updated_data.get('text', instance.text)
-        # instance.save()
 
         serializer = ReviewSerializer(instance, data=updated_data, partial=True)
         serializer.is_valid(raise_exception=True)

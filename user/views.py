@@ -13,26 +13,16 @@ import os
 
 
 class RegisterView(APIView):
-
     @extend_schema(request=UserSerializer)
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        if serializer.data["role"] == "USER":
-            profile = Profile.objects.create(user=User.objects.get(id=serializer.data['id']))
-            profile.save()
-
-        elif serializer.data["role"] == "SELLER":
-            seller_profile = SellerProfile.objects.create(user=User.objects.get(id=serializer.data['id']))
-            seller_profile.save()
-
         return Response(serializer.data)
 
 
 class LoginView(APIView):
-
     @extend_schema(request=UserSerializer)
     def post(self, request):
         data = request.data
@@ -61,37 +51,6 @@ class LoginView(APIView):
             return response
 
         return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
-
-# class LoginView(APIView):
-#     def post(self, request):
-#         email = request.data['email']
-#         password = request.data['password']
-#
-#         user = User.objects.get(email=email)
-#
-#         if user is None:
-#             raise AuthenticationFailed("User not found!")
-#
-#         if not user.check_password(password):
-#             raise AuthenticationFailed("password is not correct!")
-#
-#         payload = {
-#             'id': user.id,
-#             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-#             'iat': datetime.datetime.utcnow()
-#         }
-#
-#         token = jwt.encode(payload, os.environ.get('JWT_SECRET_KEY'), algorithm='HS256').decode('utf-8')    # older version of PyJWT==1.7.1
-#
-#         response = Response()
-#
-#         response.set_cookie(key='jwt', value=token, httponly=True)
-#
-#         response.data = {
-#             'jwt': token
-#         }
-#         return response
 
 
 class UserView(APIView):
