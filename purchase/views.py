@@ -8,22 +8,20 @@ from rest_framework.exceptions import AuthenticationFailed
 
 
 class PurchaseViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAuthenticated)
+    permission_classes = (IsAuthenticated, IsAuthenticatedOrReadOnly)
     serializer_class = PurchaseSerializer
     queryset = Purchase.objects.all()
 
     def list(self, request, *args, **kwargs):
         purchase_list = Purchase.objects.filter(user=request.user)
         serializer = PurchaseSerializer(purchase_list, many=True)
-
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        print(type(request.user))
 
-        if request.user.is_anonymous:
-            raise AuthenticationFailed("you are not authenticated!")
+        # if request.user.is_anonymous:
+        #     raise AuthenticationFailed("you are not authenticated!")
 
         item = Product.objects.get(id=data['product'])
 
@@ -43,3 +41,4 @@ class PurchaseViewSet(viewsets.ModelViewSet):
         item.save()
 
         return Response(serializer.data)
+

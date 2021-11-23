@@ -1,33 +1,18 @@
 from django.contrib import admin
 from django.urls import path, include
-
-# FOR SWAGGER
-# from rest_framework import permissions
-# from drf_yasg.views import get_schema_view
-# from drf_yasg import openapi
-# 
-# 
-# schema_view = get_schema_view(
-#    openapi.Info(
-#       title="Snippets API",
-#       default_version='v1',
-#       description="Test description",
-#       terms_of_service="https://www.google.com/policies/terms/",
-#       contact=openapi.Contact(email="contact@snippets.local"),
-#       license=openapi.License(name="BSD License"),
-#    ),
-#    public=True,
-#    permission_classes=(permissions.AllowAny,),
-# )
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/v1/product-app/', include('product.urls')),
+    path('api/v1/products/', include('product.urls')),
     path('api/v1/user/', include('user.urls')),
     path('api/v1/purchase/', include('purchase.urls')),
     path('api/v1/reviews/', include('review.urls')),
 
-    # path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),  SWAGGER
+    # SWAGGER
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]

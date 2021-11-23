@@ -1,12 +1,12 @@
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
-from .views import ReviewViewset
+from .views import ReviewViewSet
 
 
 router = DefaultRouter()
-router.register('reviews', ReviewViewset, basename='reviews')
+router.register('reviews', ReviewViewSet, basename='reviews')
 
 
 urlpatterns = [
-    url('', include(router.urls))
+    url('', include(router.urls)),
 ]

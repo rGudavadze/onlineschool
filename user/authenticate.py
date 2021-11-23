@@ -1,3 +1,5 @@
+import os
+
 import jwt
 from rest_framework import authentication, exceptions
 from .models import User
@@ -15,7 +17,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         _, token = auth_data.decode('utf-8').split(' ')
 
         try:
-            payload = jwt.decode(token, 'secret')
+            payload = jwt.decode(token, os.environ.get('JWT_SECRET_KEY'), algorithms='HS256')
 
             user = User.objects.get(id=payload['id'])
 

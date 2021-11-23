@@ -1,27 +1,39 @@
 from django.contrib.auth import authenticate
+from rest_framework import permissions
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .models import Profile, User
-from .serializer import UserSerializer
+from drf_spectacular.utils import extend_schema
+from .models import Profile, SellerProfile, User
+from .serializers import UserSerializer
 import jwt
 import datetime
+import os
 
 
 class RegisterView(APIView):
+
+    @extend_schema(request=UserSerializer)
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        profile = Profile.objects.create(user=User.objects.get(id=serializer.data['id']))
-        profile.save()
+        if serializer.data["role"] == "USER":
+            profile = Profile.objects.create(user=User.objects.get(id=serializer.data['id']))
+            profile.save()
+
+        elif serializer.data["role"] == "SELLER":
+            seller_profile = SellerProfile.objects.create(user=User.objects.get(id=serializer.data['id']))
+            seller_profile.save()
 
         return Response(serializer.data)
 
 
 class LoginView(APIView):
+
+    @extend_schema(request=UserSerializer)
     def post(self, request):
         data = request.data
         username = data['username']
@@ -36,7 +48,7 @@ class LoginView(APIView):
                 'iat': datetime.datetime.utcnow()
             }
 
-            token = jwt.encode(payload, 'secret', algorithm='HS256')
+            token = jwt.encode(payload, os.environ.get('JWT_SECRET_KEY'), algorithm='HS256')
 
             response = Response()
 
@@ -70,7 +82,7 @@ class LoginView(APIView):
 #             'iat': datetime.datetime.utcnow()
 #         }
 #
-#         token = jwt.encode(payload, 'secret', algorithm='HS256').decode('utf-8')    # older version of PyJWT==1.7.1
+#         token = jwt.encode(payload, os.environ.get('JWT_SECRET_KEY'), algorithm='HS256').decode('utf-8')    # older version of PyJWT==1.7.1
 #
 #         response = Response()
 #
@@ -90,7 +102,7 @@ class UserView(APIView):
             raise AuthenticationFailed('Unauthenticated!')
 
         try:
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            payload = jwt.decode(token, os.environ.get('JWT_SECRET_KEY'), algorithms=['HS256'])
 
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated, JWT expired!')
@@ -113,3 +125,12 @@ class Logout(APIView):
         }
 
         return response
+
+
+class ListUser(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)

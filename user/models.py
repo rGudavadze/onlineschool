@@ -7,6 +7,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=256, unique=True)
     email = models.CharField(max_length=256, unique=True)
     password = models.CharField(max_length=256)
+    role = models.CharField(max_length=9, choices=(("USER", "user"), ("SELLER", "seller")), default="USER")
 
     # USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -21,3 +22,10 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s profile"
+
+
+class SellerProfile(models.Model):
+    user = models.OneToOneField(User, related_name='seller_profile', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username}'s profile (seller)"

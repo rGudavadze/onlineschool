@@ -6,10 +6,7 @@ from .serializer import ProductSerializer, CategorySerializer
 
 class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
-
-    def get_queryset(self):
-        products = Product.objects.all()
-        return products
+    queryset = Product.objects.all()
 
     def create(self, request, *args, **kwargs):
         data = request.data

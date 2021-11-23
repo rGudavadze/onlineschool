@@ -21,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-i=xoh6y420n6qgd-1ccw98_r5+2_*umt#wh%gw7@^2n3_m)#-5'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
 
 
 # Application definition
@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     # third_party_apps
     'rest_framework',
     'corsheaders',
+    'drf_yasg',
+    'drf_spectacular',
 
 
     # my apps
@@ -89,20 +91,15 @@ WSGI_APPLICATION = 'onlineshop.wsgi.application'
 
 DATABASES = {
     'default': {
+        # 'ENGINE': "django.db.backends.sqlite3",
+        # 'NAME': BASE_DIR / 'db.sqlite3'
+
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'pgdb',
-        'PORT': 5432,
-
-        # 'ENGINE': os.environ.get("SQL_ENGINE"),  # "django.db.backends.sqlite3"
-        # 'NAME': os.environ.get("SQL_DATABASE"),  # BASE_DIR / 'db.sqlite3'
-        # 'USER': os.environ.get("SQL_USER"),
-        # 'PASSWORD': os.environ.get("SQL_PASSWORD"),
-        # 'HOST': os.environ.get("SQL_HOST"),
-        # 'PORT': os.environ.get("SQL_PORT"),
-
+        'NAME': os.environ.get('SQL_DATABASE'),
+        'USER': os.environ.get('SQL_USER'),
+        'PASSWORD': os.environ.get('SQL_PASSWORD'),
+        'HOST': os.environ.get('SQL_HOST'),
+        'PORT': os.environ.get('SQL_PORT'),
 
     }
 }
@@ -136,6 +133,20 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
         'rest_framework.permissions.AllowAny',
     ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.JSONParser',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'OnlinePlatform',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    # OTHER SETTINGS
 }
 
 # Internationalization
