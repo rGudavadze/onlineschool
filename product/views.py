@@ -18,16 +18,11 @@ class ProductViewSet(viewsets.ModelViewSet):
             )
 
         data = request.data
+        data['seller'] = user.pk
 
-        new_product = Product.objects.create(
-            name=data['name'],
-            price=data['price'],
-            description=data['description'],
-            seller=user,
-            category=Category.objects.get(slug=data['category'])
-        )
-
-        serializer = ProductSerializer(new_product)
+        serializer = ProductSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         return Response(serializer.data)
 

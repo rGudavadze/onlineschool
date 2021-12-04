@@ -20,16 +20,10 @@ class PurchaseViewSet(viewsets.ModelViewSet):
         data = request.data
         item = Product.objects.get(id=data['product'])
 
-        if request.user.purchase.filter(product=item).first():
-            return Response({"message": "You already own this product"})
+        data['user'] = request.user.pk
 
-        new_purchase = Purchase.objects.create(user=request.user, product=item)
-
-        serializer = PurchaseSerializer(new_purchase)
-
-        # if not serializer.is_valid():
-        #     return Response({"message": "enter valid data"})
-
-        new_purchase.save()
+        serializer = PurchaseSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         return Response(serializer.data)

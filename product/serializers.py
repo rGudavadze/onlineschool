@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from user.models import User
 from .models import Category, Product
 
 
@@ -15,12 +14,8 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'price', 'description', 'slug',
                   'created', 'category', 'seller', 'rating', 'rating_quantity')
 
-    # def validate(self, attrs):
-    #     pass
-    #
-    # def create(self, validated_data):
-    #     category_id = validated_data.pop('category', None)
-    #     instance = self.Meta.model(category_id=category_id, **validated_data)
-    #     instance.save()
-    #
-    #     return instance
+    def create(self, validated_data):
+        instance = self.Meta.model(**validated_data)
+        instance.save()
+
+        return instance

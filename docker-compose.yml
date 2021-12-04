@@ -20,6 +20,7 @@ services:
   pgdb:
     image: postgres
     container_name: pgdb
+    env_file: .env.dev
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres

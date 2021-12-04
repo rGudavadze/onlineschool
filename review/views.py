@@ -19,24 +19,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
+        data['user'] = request.user.id
 
-        current_product = Product.objects.get(id=data['product'])
-
-        is_reviewed = current_product.review.filter(user=request.user).first()
-        if is_reviewed:
-            return Response({"message": "You already reviewed the product!"})
-
-        new_review = Review.objects.create(text=data['text'],
-                                           rating=data['rating'],
-                                           user=request.user,
-                                           product=current_product)
-
-        current_product.rating = (current_product.rating * current_product.rating_quantity + data['rating']) / \
-                                 (current_product.rating_quantity + 1)
-        current_product.rating_quantity += 1
-        current_product.save()
-
-        serializer = ReviewSerializer(new_review)
+        serializer = ReviewSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         return Response(serializer.data)
 
