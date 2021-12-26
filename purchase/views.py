@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from user.permissions import IsAuthenticatedOrReadOnly
+from user.myPermissions import IsAuthenticatedOrReadOnly
 from .serializers import PurchaseSerializer
 from .models import Purchase, Product
 

@@ -30,5 +30,8 @@ class Product(models.Model):
         self.slug = slugify(self.name)
         super(Product, self).save(*args, **kwargs)
 
+    class Meta:
+        ordering = ("-created",)
+
     def __str__(self):
         return self.name

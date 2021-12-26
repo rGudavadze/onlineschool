@@ -1,34 +1,86 @@
 from django.test import TestCase
-from .models import Product, Category
+from rest_framework.test import APIClient
+from .models import Category, Product
+from user.models import User
 
 
 class ProductTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        category = Category.objects.create(name="Cat", slug="cat")
-        category.save()
+    def setUp(self):
+        self.client = APIClient()
+        Category.objects.create(name='test_category')
+        User.objects.create_user(
+            name="test",
+            username="test",
+            email="test@gmail.com",
+            password="test123@",
+            role="USER"
+        )
+        User.objects.create_user(
+            name="test_seller",
+            username="test_seller",
+            email="test_seller@gmail.com",
+            password="test123@",
+            role="SELLER"
+        )
 
-        product = Product.objects.create(name='new item', price=500, available=True,
-                                         description='this is new item', slug='new-item', quantity=15,
-                                         category=category)
-        product.save()
+    def test_create_product(self):
+        token = self.client.post('/api/v1/user/login/', {
+            'username': 'test_seller',
+            'password': 'test123@'
+        }).data['jwt']
 
-    def test_product_content(self):
-        product = Product.objects.get(id=1)
-        name = f"{product.name}"
-        price = f"{product.price}"
-        available = f"{product.available}"
-        description = f"{product.description}"
-        slug = f"{product.slug}"
-        quantity = f"{product.quantity}"
-        category_name = f"{product.category.name}"
-        category_slug = f"{product.category.slug}"
+        response = self.client.post('/api/v1/products/products/', data={
+            "name": "test_product",
+            "price": 100,
+            "description": "this is description about test product",
+            "category": 1
+        }, HTTP_AUTHORIZATION=f'Bearer {token}', format='json')
 
-        self.assertEqual(name, 'new item')
-        self.assertEqual(price, '500.0')
-        self.assertEqual(available, 'True')
-        self.assertEqual(description, 'this is new item')
-        self.assertEqual(slug, 'new-item')
-        self.assertEqual(quantity, '15')
-        self.assertEqual(category_name, 'Cat')
-        self.assertEqual(category_slug, 'cat')
+        self.assertEqual(response.status_code, 201)
+
+    def test_create_product_with_user(self):
+        token = self.client.post('/api/v1/user/login/', {
+            'username': 'test',
+            'password': 'test123@'
+        }).data['jwt']
+
+        response = self.client.post('/api/v1/products/products/', data={
+            "name": "test_product",
+            "price": 100,
+            "description": "this is description about test product",
+            "category": 1
+        }, HTTP_AUTHORIZATION=f'Bearer {token}', format='json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data.get('message'), "You do not have permission to add course!")
+
+    def test_update_product(self):
+        product = Product.objects.create(name="test_product",
+                                         price=100,
+                                         description="this is description about test product",
+                                         category=Category.objects.get(name="test_category"))
+        token = self.client.post('/api/v1/user/login/', {
+            'username': 'test_seller',
+            'password': 'test123@'
+        }).data['jwt']
+
+        response = self.client.patch(f'/api/v1/products/products/{product.id}/', data={
+            "price": 50
+        }, HTTP_AUTHORIZATION=f'Bearer {token}', format='json')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete_product(self):
+        product = Product.objects.create(name="test_product",
+                                         price=100,
+                                         description="this is description about test product",
+                                         category=Category.objects.get(name="test_category"))
+        token = self.client.post('/api/v1/user/login/', {
+            'username': 'test_seller',
+            'password': 'test123@'
+        }).data['jwt']
+
+        response = self.client.delete(f'/api/v1/products/products/{product.id}/',
+                                      HTTP_AUTHORIZATION=f'Bearer {token}', format='json')
+
+        self.assertEqual(response.status_code, 204)
