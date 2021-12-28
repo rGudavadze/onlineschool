@@ -15,3 +15,4 @@ class Review(models.Model):
 
     class Meta:
         ordering = ("-created",)
+        # unique_together = ""

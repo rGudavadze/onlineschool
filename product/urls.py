@@ -12,5 +12,5 @@ urlpatterns = [
     url('', include(router.urls)),
     path('search/', SearchView.as_view()),
     path('top10product/', TopTenProduct.as_view()),
-    path('<product_pk>/reviews/', include('review.urls')),
+    path('<product_id>/reviews/', include('review.urls')),
 ]

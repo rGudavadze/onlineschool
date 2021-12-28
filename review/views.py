@@ -12,13 +12,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
 
     @staticmethod
-    def rating_update_after_update_product(product, old_rating, updated_data):
-        product.rating = (int(product.rating * product.rating_quantity + 0.5) -
-                          old_rating + updated_data['rating']) / \
-                          product.rating_quantity
-        product.save()
-
-    @staticmethod
     def rating_update_after_delete_product(review, product):
         try:
             product.rating = (int(product.rating * product.rating_quantity + 0.5)
@@ -45,6 +38,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
+        data['product'] = kwargs.get('product_id')
         data['user'] = request.user.id
 
         serializer = ReviewSerializer(data=data)
@@ -53,26 +47,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = ReviewSerializer(instance)
-        return Response(serializer.data)
-
-    # Product update should be into serializer.
     def partial_update(self, request, *args, **kwargs):
         updated_data = request.data
+        updated_data['product'] = kwargs.get('product_id')
+
         instance = self.get_object()
-
-        old_rating = instance.rating
-        current_product = instance.product
-
-        if "rating" in updated_data:
-            ReviewViewSet.rating_update_after_update_product(current_product, old_rating, updated_data)
 
         serializer = ReviewSerializer(instance, data=updated_data, partial=True)
         serializer.is_valid(raise_exception=True)
-
-        self.perform_update(serializer)
+        serializer.save()
 
         return Response(serializer.data)
 
