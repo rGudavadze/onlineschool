@@ -9,7 +9,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def rating_update_after_create_review(product, validated_data):
-        print(validated_data)
         product.rating = (product.rating * product.rating_quantity + validated_data['rating']) / \
                          (product.rating_quantity + 1)
         product.rating_quantity += 1
@@ -21,15 +20,6 @@ class ReviewSerializer(serializers.ModelSerializer):
                           old_rating + updated_data['rating']) / product.rating_quantity
 
         product.save()
-
-    def validate(self, attrs):
-        user = attrs.get('user')
-        product = attrs.get('product')
-
-        if product.review.filter(user=user).first():
-            raise serializers.ValidationError("You already reviewed the product!")
-
-        return super().validate(attrs)
 
     def create(self, validated_data):
         instance = super().create(validated_data)

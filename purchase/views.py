@@ -1,13 +1,12 @@
-from rest_framework import viewsets
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from user.myPermissions import IsAuthenticatedOrReadOnly
 from .serializers import PurchaseSerializer
 from .models import Purchase, Product
 
 
-class PurchaseViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, IsAuthenticatedOrReadOnly)
+class PurchaseView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated, )
     serializer_class = PurchaseSerializer
     queryset = Purchase.objects.all()
 
@@ -18,7 +17,6 @@ class PurchaseViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        item = Product.objects.get(id=data['product'])
 
         data['user'] = request.user.pk
 

@@ -34,10 +34,4 @@ class UserSerializer(serializers.ModelSerializer):
             instance.password_confirm = ""
         instance.save()
 
-        if validated_data['role'] == 'SELLER':
-            SellerProfile.objects.create(user=instance)
-
-        elif validated_data['role'] == 'USER':
-            Profile.objects.create(user=instance)
-
         return instance

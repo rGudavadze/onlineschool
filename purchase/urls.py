@@ -1,12 +1,7 @@
-from django.conf.urls import url, include
-from rest_framework.routers import DefaultRouter
-from .views import PurchaseViewSet
-
-
-router = DefaultRouter()
-router.register('purchase', PurchaseViewSet, basename='purchase')
+from django.urls import path
+from .views import PurchaseView
 
 
 urlpatterns = [
-    url('', include(router.urls))
+    path('', PurchaseView.as_view())
 ]

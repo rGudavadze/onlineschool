@@ -12,6 +12,15 @@ class User(AbstractUser):
 
     # USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+    
+    def save(self, *args, **kwargs):
+        super(User, self).save(*args, **kwargs)
+
+        if self.role == 'SELLER':
+            SellerProfile.objects.create(user=self)
+        
+        if self.role == 'USER':
+            Profile.objects.create(user=self)
 
     def __str__(self):
         return self.username

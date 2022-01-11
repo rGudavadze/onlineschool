@@ -10,3 +10,10 @@ class Purchase(models.Model):
 
     def __str__(self):
         return f"{self.user.name} purchased {self.product.name} that costs ${self.product.price}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "product"], name="unique_purchase_user_product"
+            )
+        ]
